@@ -4,6 +4,8 @@ from pprint import pprint
 from Login import Login
 import requests
 import json
+import random
+import time
 
 class OhMyHome:
     """This is the class that handles all operations for retreiving data
@@ -22,7 +24,7 @@ class OhMyHome:
         self.headers = {
             "Host": "watch.ohmyhome.ca",
             "Proxy-Connection": "keep-alive",
-            "Content-Length": 126,
+            "Content-Length": '133',
             "Accept": "application/json, text/plain, */*",
             "Origin": "http://watch.ohmyhome.ca",
             "User-Agent": ua['random'],
@@ -39,16 +41,56 @@ class OhMyHome:
         print ('Retrieving Jason for %s' % url)
 
         session = requests.session()
-        r = session.post(url, data=json.dumps(r_payload), headers=self.headers)
-        data = r.json()
+        resp = session.post(url, data=json.dumps(r_payload),
+                            headers=self.headers)
+        if resp.status_code == 200:
+            print ('Data successfully rerieved')
+            data = resp.json()
+        else:
+            print ('Unable to get data, status code %s' % resp.status_code)
+            data = None
         return data
 
-    def _buildPayload(self):
-        pass
+    def _getCoords(self):
+        south = config.SOUTH
+        west = config.WEST
+        lat_div = (config.NORTH - config.SOUTH)/config.DIVISIONS
+        long_div = (abs(config.WEST) - abs(config.EAST))/config.DIVISIONS
+        lat_coords = [south]
+        long_coords = [west]
+
+        for x in range(0, config.DIVISIONS):
+            south += lat_div
+            west += long_div
+            lat_coords.append(south)
+            long_coords.append(west)
+        return lat_coords, long_coords
+
+    def _buildPayloads(self):
+        lat_coords, long_coords = self._getCoords()
+        payloads = []
+        for x in range(1, config.DIVISIONS+1):
+            for y in range(1, config.DIVISIONS+1):
+                payloads.append({
+                    "latitude1": lat_coords[y-1],
+                    "longitude1": long_coords[x-1],
+                    "latitude2": lat_coords[y],
+                    "longitude2": long_coords[x]
+                    })
+
+        return payloads
+
+    def main(self):
+        payloads = self._buildPayloads()
+
+        for payload in payloads:
+            pass
+            time.sleep(random.randint(0, config.SLEEP))
         return
 
     def get(self):
         r_payload = config.OHMY_PAYLOAD
+        # print r_payload
         url = config.HOUSE_SOLD_URL
         data = self._getJason(url, r_payload)
         return data

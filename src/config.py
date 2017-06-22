@@ -22,10 +22,12 @@ WEST = -84.46112094932249
 NORTH = 45.33449283652978
 EAST = -73.99664341025999
 
+DIVISIONS = 10
+
 OHMY_PAYLOAD = {
     "latitude1": SOUTH,
     "longitude1":WEST,
-    "latitude2": NORTH
+    "latitude2": NORTH,
     "longitude2":EAST
     }
 

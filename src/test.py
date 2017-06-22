@@ -8,7 +8,7 @@ r_payload = {"latitude1":43.700799103429205,"longitude1":-79.5900262451172,"lati
 headers = {
     "Host": "watch.ohmyhome.ca",
     "Proxy-Connection": "keep-alive",
-    "Content-Length": 126,
+    "Content-Length": '126',
     "Accept": "application/json, text/plain, */*",
     "Origin": "http://watch.ohmyhome.ca",
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
@@ -28,15 +28,17 @@ headers = {
 
 session = requests.session()
 r = session.post('http://watch.ohmyhome.ca/CondoSold/CondoSold.php',data=json.dumps(r_payload), headers=headers)
+
+print (r.status_code)
 data = json.loads(r.text)
 
 
-
-
-{"latitude1":43.700799103429205,"longitude1":-79.5900262451172,"latitude2":43.89903646281729,"longitude2":-79.12997375488283}
-
-
-
-{"latitude1":42.78900762936104,"longitude1":-81.25239501953126,"latitude2":44.38046530469301,"longitude2":-77.57197509765626}
-
-{"latitude1":43.621817081568324,"longitude1":-81.50508056640626,"latitude2":45.191382966135095,"longitude2":-77.82466064453126}
+#
+#
+# {"latitude1":43.700799103429205,"longitude1":-79.5900262451172,"latitude2":43.89903646281729,"longitude2":-79.12997375488283}
+#
+#
+#
+# {"latitude1":42.78900762936104,"longitude1":-81.25239501953126,"latitude2":44.38046530469301,"longitude2":-77.57197509765626}
+#
+# {"latitude1":43.621817081568324,"longitude1":-81.50508056640626,"latitude2":45.191382966135095,"longitude2":-77.82466064453126}

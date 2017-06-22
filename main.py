@@ -8,4 +8,4 @@ from src.OhMyHome import OhMyHome
 # mongo.scrapeRecords('list')
 
 ohmy = OhMyHome()
-data = ohmy.get()
+data = ohmy.main()
