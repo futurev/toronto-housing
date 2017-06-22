@@ -1,2 +1,4 @@
 *.pyc*
 *private.py
+*.DS_Store*
+*.csv*
