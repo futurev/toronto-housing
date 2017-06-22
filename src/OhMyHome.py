@@ -44,7 +44,7 @@ class OhMyHome:
         resp = session.post(url, data=json.dumps(r_payload),
                             headers=self.headers)
         if resp.status_code == 200:
-            print ('Data successfully rerieved')
+            print ('Data successfully retrieved')
             data = resp.json()
         else:
             print ('Unable to get data, status code %s' % resp.status_code)
@@ -82,9 +82,8 @@ class OhMyHome:
 
     def main(self):
         payloads = self._buildPayloads()
-
-        for payload in payloads:
-            pass
+        for x, payload in enumerate(payloads):
+            data = self._getJason(config.HOUSE_SOLD_URL, payload)
             time.sleep(random.randint(0, config.SLEEP))
         return
 

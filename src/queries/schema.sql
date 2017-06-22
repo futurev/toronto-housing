@@ -54,7 +54,6 @@ ANALYZE sale_records (id);
 
 
 
-
 CREATE TABLE sold_records (
   id varchar(50) PRIMARY KEY,
   address1 varchar(200),

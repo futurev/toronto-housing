@@ -5,10 +5,12 @@ import json
 r_payload = {"latitude1":30.002461804899646,"longitude1":-100.11478763671875,"latitude2":50.588339099337574,"longitude2":-50.60563236328125}
 r_payload = {"latitude1":43.700799103429205,"longitude1":-79.5900262451172,"latitude2":43.89903646281729,"longitude2":-79.12997375488283}
 
+{'latitude1': 41.279572967087944, 'latitude2': 41.68506495403213, 'longitude2': -83.41467319541624, 'longitude1': -84.46112094932249}
+
 headers = {
     "Host": "watch.ohmyhome.ca",
     "Proxy-Connection": "keep-alive",
-    "Content-Length": '126',
+    "Content-Length": '500',
     "Accept": "application/json, text/plain, */*",
     "Origin": "http://watch.ohmyhome.ca",
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
@@ -27,10 +29,11 @@ headers = {
 
 
 session = requests.session()
-r = session.post('http://watch.ohmyhome.ca/CondoSold/CondoSold.php',data=json.dumps(r_payload), headers=headers)
+r = session.post('http://watch.ohmyhome.ca/HouseSold/HouseSold.php', data=json.dumps(r_payload), headers=headers)
 
 print (r.status_code)
 data = json.loads(r.text)
+print (data)
 
 
 #
