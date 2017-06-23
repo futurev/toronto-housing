@@ -55,13 +55,11 @@ def check_date(**kwargs):
 def get_coords(**kwargs):
     """Function to extract the lat/lon coordinates"""
     try:
-        val = kwargs['val']['coordinates']
-        # cleaned_val = "{0} {1}"
-        # cleaned_val = cleaned_val.format(round(val[0],6), round(val[1],6))
-        cleaned_val = [val[0], val[1]]
+        val = kwargs['val']
+        cleaned_val = [float(val[0]), float(val[1])]
     except Exception as e:
         cleaned_val = None
-        print ('Unable to parse date from %s due to error %s' % (val, e.message))
+        print ('Unable to parse coords from %s due to error %s' % (val, e.message))
     return cleaned_val
 
 

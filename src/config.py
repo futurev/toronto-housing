@@ -14,7 +14,7 @@ PS_DB_NAME = "postgres"
 PS_PORT = 5432
 
 ## max sleep time (seconds)
-SLEEP = 0
+SLEEP = 2
 
 ## coordinates
 SOUTH = 42.7347443837978
@@ -24,12 +24,13 @@ EAST = -77.49128280692747
 
 DIVISIONS = 10
 
-OHMY_PAYLOAD = {
-    "latitude1": SOUTH,
-    "longitude1":WEST,
-    "latitude2": NORTH,
-    "longitude2":EAST
-    }
+TEST_PAYLOAD = {
+    "latitude1": 43.700799103429205,
+    "longitude1": -79.5900262451172,
+    "latitude2": 43.89903646281729,
+    "longitude2": -79.12997375488283
+}
+
 
 ################################
 ##      DATABASE INFO         ##
@@ -67,6 +68,50 @@ MONGO_FIELD_MAP = {
 }
 
 
+
+OHMY_FIELD_MAP = {
+    'sale': [
+        {'name': 'mlsno', 'func': 'check_varchar', 'length': 20},
+        {'name': 'city', 'func': 'check_varchar', 'length': 50},
+        {'name': 'area', 'func': 'check_varchar', 'length': 50},
+
+        {'name': 'solddate', 'func': 'check_date'},
+        {'name': 'inputdate', 'func': 'check_date'},
+        {'name': 'soldprice', 'func': 'check_int'},
+        {'name': 'askprice', 'func': 'check_int'},
+
+        {'name': 'stname', 'func': 'check_varchar', 'length': 50},
+        {'name': 'stno', 'func': 'check_varchar', 'length': 50},
+        {'name': 'sttype', 'func': 'check_varchar', 'length': 50},
+        {'name': 'status', 'func': 'check_varchar', 'length': 20},
+
+        {'name': 'style', 'func': 'check_varchar', 'length': 50},
+        {'name': 'type', 'func': 'check_varchar', 'length': 50},
+
+        {'name': 'wshrm', 'func': 'check_int'},
+        {'name': 'bdrm', 'func': 'check_int'}
+    ],
+    'list': [
+        {'name': 'mlsno', 'func': 'check_varchar', 'length': 20},
+        {'name': 'city', 'func': 'check_varchar', 'length': 50},
+        {'name': 'area', 'func': 'check_varchar', 'length': 50},
+
+        {'name': 'inputdate', 'func': 'check_date'},
+        {'name': 'askprice', 'func': 'check_int'},
+
+        {'name': 'stname', 'func': 'check_varchar', 'length': 50},
+        {'name': 'stno', 'func': 'check_varchar', 'length': 10},
+        {'name': 'sttype', 'func': 'check_varchar', 'length': 20},
+        {'name': 'status', 'func': 'check_varchar', 'length': 20},
+
+        {'name': 'style', 'func': 'check_varchar', 'length': 50},
+        {'name': 'type', 'func': 'check_varchar', 'length': 50},
+
+        {'name': 'wshrm', 'func': 'check_int'},
+        {'name': 'bdrm', 'func': 'check_int'}
+    ]
+}
+
 ###############################################################################
 ########################           OH MY HOME          ########################
 ###############################################################################
@@ -83,6 +128,12 @@ HOUSE_LIST_URL = "http://watch.ohmyhome.ca/HouseForSale/HouseForSale.php"
 CONDO_SOLD_URL = "http://watch.ohmyhome.ca/CondoSold/CondoSold.php"
 CONDO_LIST_URL = "http://watch.ohmyhome.ca/CondoForSale/CondoForSale.php"
 
+OH_MY_URLS = [
+    # {'url': HOUSE_SOLD_URL, 'type': 'sale'},
+    {'url': HOUSE_LIST_URL, 'type': 'list'}
+    # {'url': CONDO_SOLD_URL, 'type': 'sale'},
+    # {'url': CONDO_LIST_URL, 'type': 'list'}
+    ]
 
 ###############################################################################
 ########################            MONGO HOUSE          ######################

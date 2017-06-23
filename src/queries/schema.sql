@@ -53,19 +53,50 @@ ANALYZE list_records (id);
 ANALYZE sale_records (id);
 
 
+CREATE TABLE sale_records (
+  id varchar(20) PRIMARY KEY,
+  city varchar(50),
+  area varchar(50),
+  solddate date,
+  inputdate date,
+  soldprice integer,
+  askprice integer,
+  stname varchar(50),
+  stno varchar(10),
+  sttype varchar(20),
+  status varchar(20),
+  style varchar(50),
+  type varchar(50),
+  wshrm integer,
+  bdrm integer,
 
-CREATE TABLE sold_records (
-  id varchar(50) PRIMARY KEY,
-  address1 varchar(200),
-  address2 varchar(200),
-  age varchar(15),
-  sqft varchar(15),
-  balcony varchar(15),
-  basement varchar(15),
-  bedrooms varchar(5),
-  amenities text,
-  community varchar(50),
-
-
+  location geography(POINT,4326)
 )
 ;
+
+
+CREATE TABLE list_records (
+  id varchar(20) PRIMARY KEY,
+  city varchar(50),
+  area varchar(50),
+  inputdate date,
+  askprice integer,
+  stname varchar(50),
+  stno varchar(10),
+  sttype varchar(20),
+  status varchar(20),
+  style varchar(50),
+  type varchar(50),
+  wshrm integer,
+  bdrm integer,
+
+  location geography(POINT,4326)
+)
+;
+
+
+CREATE INDEX list_records_id ON list_records (id);
+CREATE INDEX sale_records_id ON sale_records (id);
+
+ANALYZE list_records (id);
+ANALYZE sale_records (id);
