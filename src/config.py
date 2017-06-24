@@ -14,7 +14,7 @@ PS_DB_NAME = "postgres"
 PS_PORT = 5432
 
 ## max sleep time (seconds)
-SLEEP = 2
+SLEEP = 4
 
 ## coordinates
 SOUTH = 42.7347443837978
@@ -22,7 +22,7 @@ WEST = -82.05335556083372
 NORTH = 45.317234079179435
 EAST = -77.49128280692747
 
-DIVISIONS = 10
+DIVISIONS = 15
 
 TEST_PAYLOAD = {
     "latitude1": 43.700799103429205,
@@ -129,8 +129,8 @@ CONDO_SOLD_URL = "http://watch.ohmyhome.ca/CondoSold/CondoSold.php"
 CONDO_LIST_URL = "http://watch.ohmyhome.ca/CondoForSale/CondoForSale.php"
 
 OH_MY_URLS = [
-    # {'url': HOUSE_SOLD_URL, 'type': 'sale'},
-    # {'url': HOUSE_LIST_URL, 'type': 'list'}
+    {'url': HOUSE_SOLD_URL, 'type': 'sale'},
+    {'url': HOUSE_LIST_URL, 'type': 'list'}
     {'url': CONDO_SOLD_URL, 'type': 'sale'},
     {'url': CONDO_LIST_URL, 'type': 'list'}
     ]

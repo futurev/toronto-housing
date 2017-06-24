@@ -56,20 +56,27 @@ class OhMyHome:
         dbo.closeConnection(conn)
         return
 
-    def _getJason(self, url, r_payload):
+    def _getJason(self, url, r_payload, callback=False):
         """Internal Function to hit the ohmyhome API and return a json object
         """
         log.info('Retrieving Jason for %s' % url)
 
         session = requests.session()
-        resp = session.post(url, data=json.dumps(r_payload),
-                            headers=self.headers)
-        if resp.status_code == 200:
-            data = resp.json()
-            log.info('%s rows successfully retrieved' % str(len(data)))
-        else:
-            log.error('Unable to get data, status code %s' % resp.status_code)
-            data = None
+        data = None
+        try:
+            resp = session.post(url, data=json.dumps(r_payload),
+                                headers=self.headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                log.info('%s rows successfully retrieved' % str(len(data)))
+            else:
+                log.error('Unable to get data, status code %s' % resp.status_code)
+        except Exception as e:
+            log.error("Unable to connect to ohmyhome due to error %s" % e.message)
+            if callback == False: ## this prevents the callback from being executed more than once
+                time.sleep(10)
+                data = self._getJason(url, r_payload, callback=True)
+
         return data
 
     def _getCoords(self):
@@ -160,7 +167,6 @@ class OhMyHome:
 
     def main(self):
         payloads = self._buildPayloads()
-        payloads = []
         for api in config.OH_MY_URLS:
             self._getHeaders()
             for x, payload in enumerate(payloads):
