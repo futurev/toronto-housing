@@ -130,9 +130,9 @@ CONDO_LIST_URL = "http://watch.ohmyhome.ca/CondoForSale/CondoForSale.php"
 
 OH_MY_URLS = [
     # {'url': HOUSE_SOLD_URL, 'type': 'sale'},
-    {'url': HOUSE_LIST_URL, 'type': 'list'}
-    # {'url': CONDO_SOLD_URL, 'type': 'sale'},
-    # {'url': CONDO_LIST_URL, 'type': 'list'}
+    # {'url': HOUSE_LIST_URL, 'type': 'list'}
+    {'url': CONDO_SOLD_URL, 'type': 'sale'},
+    {'url': CONDO_LIST_URL, 'type': 'list'}
     ]
 
 ###############################################################################

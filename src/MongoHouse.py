@@ -7,6 +7,7 @@ import DataCleaning
 import random
 import time
 import math
+import logging as log
 
 class MongoHouse:
     """This is the class that handles all operations for using the

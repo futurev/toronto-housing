@@ -8,6 +8,7 @@ import random
 import time
 import DataCleaning
 import database_operations as dbo
+import logging as log
 
 class OhMyHome:
     """This is the class that handles all operations for retreiving data
@@ -41,7 +42,7 @@ class OhMyHome:
     def _getStoredRecords(self):
         """Internal function to retrieve the ids of all properties that have already been
         scraped"""
-        print ('Getting stored records')
+        log.info('Getting stored records')
         conn = dbo.getConnection()
 
         query = "SELECT id FROM sale_records"
@@ -58,16 +59,16 @@ class OhMyHome:
     def _getJason(self, url, r_payload):
         """Internal Function to hit the ohmyhome API and return a json object
         """
-        print ('Retrieving Jason for %s' % url)
+        log.info('Retrieving Jason for %s' % url)
 
         session = requests.session()
         resp = session.post(url, data=json.dumps(r_payload),
                             headers=self.headers)
         if resp.status_code == 200:
             data = resp.json()
-            print ('%s rows successfully retrieved' % str(len(data)))
+            log.info('%s rows successfully retrieved' % str(len(data)))
         else:
-            print ('Unable to get data, status code %s' % resp.status_code)
+            log.error('Unable to get data, status code %s' % resp.status_code)
             data = None
         return data
 
@@ -102,7 +103,7 @@ class OhMyHome:
 
     def _storeData(self, data, query):
         """Interal function to store scraped data"""
-        print ('Storing data')
+        log.info('Storing data')
         conn = dbo.getConnection()
         dbo.execute_query(conn, query, data, multiple=True)
         dbo.closeConnection(conn)
@@ -153,19 +154,22 @@ class OhMyHome:
             query = "INSERT INTO " + table + " VALUES (" + cols + \
                 ", ST_GeomFromText('POINT(%s %s)', 4326))"
             self._storeData(parsed_records, query)
+        else:
+            log.info('All records have already been stored for this area')
         return
 
     def main(self):
         payloads = self._buildPayloads()
+        payloads = []
         for api in config.OH_MY_URLS:
             self._getHeaders()
             for x, payload in enumerate(payloads):
-                print ('getting payload #%s' % str(x))
+                log.info('getting payload #%s \n%s' % (str(x), payload))
                 data = self._getJason(api['url'], payload)
                 if data:
                     self._parseData(data, api['type'])
                 else:
-                    print ('no data returned')
+                    log.info('no data returned')
                 time.sleep(random.randint(0, config.SLEEP))
         return
 

@@ -1,4 +1,5 @@
 import config
+import logging as log
 
 def check_int(**kwargs):
     """Function to check if the field is an integer and convert if necessary"""
@@ -9,7 +10,7 @@ def check_int(**kwargs):
             val = int(kwargs['val'])
         except Exception as e:
             val = None
-            print ('Unable to convert %s to an integer due to error %s' %
+            log.error('Unable to convert %s to an integer due to error %s' %
                     (val, e.message))
     return val
 
@@ -19,7 +20,7 @@ def check_varchar(**kwargs):
     try:
         cleaned_val = str(val)[0:kwargs['length']]
     except Exception as e:
-        print ('Unable to convert %s to a string due to error %s' %
+        log.error('Unable to convert %s to a string due to error %s' %
                 (val, e.message))
         cleaned_val = None
     return cleaned_val
@@ -36,7 +37,7 @@ def check_char(**kwargs):
         try:
             val = str(kwargs['val'])
         except Exception as e:
-            print ('Unable to convert %s to a string due to error %s' %
+            log.error('Unable to convert %s to a string due to error %s' %
                     (val, e.message))
             return None
     cleaned_val = val[0:kwargs['length']]
@@ -49,7 +50,7 @@ def check_date(**kwargs):
         cleaned_val = val[0:10]
     except Exception as e:
         cleaned_val = None
-        print ('Unable to parse date from %s due to error %s' (val, e.message))
+        log.error('Unable to parse date from %s due to error %s' (val, e.message))
     return cleaned_val
 
 def get_coords(**kwargs):
@@ -59,7 +60,7 @@ def get_coords(**kwargs):
         cleaned_val = [float(val[0]), float(val[1])]
     except Exception as e:
         cleaned_val = None
-        print ('Unable to parse coords from %s due to error %s' % (val, e.message))
+        log.error('Unable to parse coords from %s due to error %s' % (val, e.message))
     return cleaned_val
 
 
@@ -71,8 +72,8 @@ def get_property_type(**kwargs):
         for v in vals:
             if v in config.PROPERTY_TYPES:
                 return v
-        print ('No property type found in %s' % vals)
+        log.error('No property type found in %s' % vals)
     except Exception as e:
-        print ('Unable to get property type from %s due to error %s'
+        log.error('Unable to get property type from %s due to error %s'
                 % (vals, e.message))
     return 'Other'
