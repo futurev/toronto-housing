@@ -1,4 +1,4 @@
-setwd("/Users/whitesi/Documents/Programming/Python/toronto-housing")
+setwd("/Users/whitesi/Documents/Programming/Python/toronto-housing/analysis")
 
 source("Postgres.R")
 library(ggplot2)
@@ -19,39 +19,61 @@ palette <- brewer.pal("YlGnBu", n=9)
 ###########################################
 
 conn = getPSconn('postgres')
-strSQL = ""
 
-data = dbGetQuery(conn, strSQL) %>% setDT
+
+sold = dbGetQuery(conn, "SELECT * FROM sale_records") %>% setDT
+notify('sold load complete')
+list = dbGetQuery(conn, "SELECT * FROM list_records") %>% setDT
+notify('list load complete')
 #data = dbReadTable(conn, 'all_fsa_meta')
+
+
+############################################
+############  DATA CLEANING ################
+############################################
+sold[, location := NULL]
+list[, location := NULL]
+
+# days on market
+sold[, dom := as.integer(solddate-inputdate)]
+
+sold[, region := city]
+sold[substr(city,1,7) == 'Toronto', region := 'Toronto']
+
+sold[, yymm := substr(solddate,1,7)]
 
 #######################################
 ############  PLOTTING ################
 #######################################
 
-
-ggplot(data[!(month %in% c('2017-02')) & property_type != 'Other',],
-       aes(x=month, y=avg_list_price, label=count, fill=property_type)) +
-  geom_bar(stat='identity', position="dodge") +  theme_dlin() +
-  geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
-  labs(title = 'Toronto Property Listings', y='Median Listing Price', x='Date', fill='Property Type') +
-  scale_y_continuous(labels = dollar,breaks=number_ticks(10)) +
-  scale_fill_manual("Property Type",
-                    values = c("Condo" = "#004977", "Detached" = "#D03027","Semi-Detached"="#018BBB", "Townhouse" = "#0EA218"))
+main_types = c('Detached', 'Condo Apt', 'Semi-Detached', 'Att/Row/Twnhouse','Condo Townhouse')
 
 
-
-ggplot(data[month != '2017-02' & property_type != 'Other',],
-       aes(x=month, y=med_sale_price, label=count, fill=property_type)) +
+ggplot(sold[region=='Toronto' & type %in% main_types, 
+            .(med_sale_price=as.integer(median(soldprice)), count=.N) ,by=.(yymm,type)],
+       aes(x=yymm, y=med_sale_price, label=count, fill=type)) +
   geom_bar(stat='identity', position="dodge") +  theme_dlin() +
   geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
   labs(title = 'Toronto Property Sales', y='Median Sale Price', x='Date', fill='Property Type') +
-  scale_y_continuous(labels = dollar,breaks=number_ticks(10)) +
-  scale_fill_manual("Property Type",
-                    values = c("Condo" = "#004977", "Detached" = "#D03027","Semi-Detached"="#018BBB", "Townhouse" = "#0EA218"))
+  scale_y_continuous(labels = dollar,breaks=number_ticks(10))
+
+ggplot(sold[region=='Toronto' & type %in% main_types, 
+            .(med_sale_price=mean(soldprice), count=.N, dom = mean(dom)) ,by=.(yymm,type)],
+       aes(x=yymm, y=dom, label=count, fill=type)) +
+  geom_bar(stat='identity', position="dodge") +  theme_dlin() +
+  # geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  labs(title = 'Toronto Property Sales', y='Average Days on the Market', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = comma, breaks=number_ticks(10))
 
 
-sales = dbGetQuery(conn, "SELECT * FROM sale_records") %>% setDT
-listings = dbGetQuery(conn, "SELECT * FROM list_records") %>% setDT
 
-sales[, location:=NULL]
-listings[, location:=NULL]
+
+
+
+##PLOTTING TO DO:
+
+##SOLD
+
+
+##LIST
+# track number of price changes
