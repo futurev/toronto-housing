@@ -185,3 +185,7 @@ class OhMyHome:
         data = self._getJason(url, payload)
         self._parseData(data, 'sale')
         return
+
+## TODO
+# 1) update listing status to sold once it appears in sold records
+# 2) list_records_chng_hist table

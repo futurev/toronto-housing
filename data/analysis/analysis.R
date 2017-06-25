@@ -40,13 +40,27 @@ sold[, dom := as.integer(solddate-inputdate)]
 sold[, region := city]
 sold[substr(city,1,7) == 'Toronto', region := 'Toronto']
 
+list[, region := city]
+list[substr(city,1,7) == 'Toronto', region := 'Toronto']
+
 sold[, yymm := substr(solddate,1,7)]
+list[, yymm := substr(inputdate,1,7)]
+
+# pct over ask
+
+sold[, poa := (soldprice-askprice)/askprice]
+
+
+
+
 
 #######################################
 ############  PLOTTING ################
 #######################################
 
 main_types = c('Detached', 'Condo Apt', 'Semi-Detached', 'Att/Row/Twnhouse','Condo Townhouse')
+homes = c('Detached', 'Semi-Detached', 'Att/Row/Twnhouse')
+condos = c('Condo Apt', 'Condo Townhouse')
 
 
 ggplot(sold[region=='Toronto' & type %in% main_types, 
@@ -57,6 +71,7 @@ ggplot(sold[region=='Toronto' & type %in% main_types,
   labs(title = 'Toronto Property Sales', y='Median Sale Price', x='Date', fill='Property Type') +
   scale_y_continuous(labels = dollar,breaks=number_ticks(10))
 
+
 ggplot(sold[region=='Toronto' & type %in% main_types, 
             .(med_sale_price=mean(soldprice), count=.N, dom = mean(dom)) ,by=.(yymm,type)],
        aes(x=yymm, y=dom, label=count, fill=type)) +
@@ -66,8 +81,22 @@ ggplot(sold[region=='Toronto' & type %in% main_types,
   scale_y_continuous(labels = comma, breaks=number_ticks(10))
 
 
+ggplot(sold[region=='Toronto' & type %in% main_types, 
+            .(med_sale_price=median(poa), count=.N) ,by=.(yymm,type)],
+       aes(x=yymm, y=med_sale_price, label=count, fill=type)) +
+  geom_bar(stat='identity', position="dodge") +  theme_dlin() +
+  geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  labs(title = 'Toronto Property Sales - Price Over Ask', y='Median Price Over Ask', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = percent,breaks=number_ticks(10))
 
 
+ggplot(list[region=='Toronto' & type %in% main_types & askprice<2e6 & inputdate>'2017-04-01', 
+            .(med_list_price=as.integer(median(askprice)), count=.N) ,by=.(yymm,type)],
+       aes(x=yymm, y=med_list_price, label=count, fill=type)) +
+  geom_bar(stat='identity', position="dodge") +  theme_dlin() +
+  geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  labs(title = 'Toronto Property Listings', y='Median Asking Price', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = comma,breaks=number_ticks(10))
 
 
 ##PLOTTING TO DO:
