@@ -1,0 +1,54 @@
+.sliderContainer div{
+		display: inline-block;
+}
+
+#inputContainer div {
+		display: inline-block;
+}
+
+.info {
+	padding: 12px 16px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+.info h4 {
+		margin: 0 0 5px;
+		color: #777;
+	}
+
+#slider_main .noUi-connect {
+	background: #18BC9C;
+	}
+
+#slider_debt .noUi-connect {
+	background: #F39C12;
+	}
+
+#slider_time .noUi-connect {
+	background: #e74c3c;
+}
+
+.legend {
+    line-height: 18px;
+    color: #555;
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+
+.odometer {
+    font-size: 25px;
+    <!-- vertical-align:middle; -->
+    margin: 10px 120px 0 0;
+		text-align: center;
+}
+
+.top-buffer { margin-top:40px; }

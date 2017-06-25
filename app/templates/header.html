@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    {% block head %}
+
+	  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>{% block title %}{% endblock %} &mdash; Toronto Housing </title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/home.png') }}">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome-4.6.3/css/font-awesome.min.css') }}" />
+
+    <!--jquery-->
+    <script src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
+
+    <!-- Leaflet CSS -->
+    <script>L_PREFER_CANVAS = true;</script>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/home.png') }}" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+
+    <!--leaflet easy button-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.css">
+
+    <!--font-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <!--table css-->
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+
+    <!-- Odometr includes -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/odometer.css') }}" />
+
+    <!-- DC.js -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dc.css') }}">
+	{% block css %}{% endblock %}
+
+    <!-- jQuery library -->
+    <!-- <script src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script> -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <!-- table JavaScript -->
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+
+    <!-- Leaflet Spin JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+
+
+    <!-- D3/DC/Crossfitler includes -->
+    <script src="{{ url_for('static', filename='js/d3.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crossfilter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dc.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/colorbrewer.js') }}"></script>
+
+    <!-- noUiSlider -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+
+    <script src="https://unpkg.com/leaflet-easybutton@2.0.0/src/easy-button.js"></script>
+    <script src="https://use.fontawesome.com/76435eb78f.js"></script>
+
+    <script src="{{ url_for('static', filename='js/wNumb.js') }}"></script>
+
+    <!-- Odometr includes -->
+    <!-- <script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
+    <script src="{{ url_for('static', filename='js/odometer.js') }}" />
+
+    {% block javascript %}{% endblock %}
+
+
+    <script>
+
+    //<!-- get current URL path and assign 'active' class to TopNav bar -->
+    function activeNavTab() {
+        var pathname = window.location.pathname;
+        if (pathname.indexOf('/explore_all') != -1) {
+            $('#explore_all-tab').addClass('active');
+        } else if (pathname.indexOf('/home') != -1) {
+            $('#home-tab').addClass('active');
+        } else if (pathname.indexOf('/explore') != -1) {
+            $('#explore-tab').addClass('active');
+        } else if (pathname.indexOf('/tableau') != -1) {
+            $('#tableau-tab').addClass('active');
+        } else if (pathname.indexOf('/compare') != -1) {
+            $('#compare-tab').addClass('active');
+        }
+    }
+    activeNavTab();
+    </script>
+
+<!-- #b79f56 -->
+    <!-- CUSTOM STYLE STUFF -->
+    <style type="text/css">
+        a {
+            text-decoration: none !important;
+            color: #708090;
+        }
+        a:hover {
+            color:#000000;
+        }
+        .container {
+            width: 100%;
+            padding: 0;
+        }
+        .container-fluid {
+            width: 100%;
+        }
+
+        #points{
+            width:100%;
+            height:100%;
+            position:relative;
+            z-index:100;
+        }
+        #container {
+            position: relative;
+            overflow: hidden;
+            background: #ddd;
+        }
+
+        .map {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+        }
+
+        .tile {
+            pointer-events: none;
+            position: absolute;
+            width: 256px;
+            height: 256px;
+        }
+
+        body {
+          padding-top: 90px;
+          margin-bottom: 60px;
+        }
+
+        .modal {
+         display: none;
+         position: fixed;
+         z-index: 750;
+         top: 0;
+         left: 0;
+         height: 100%;
+         width: 100%;
+         background: rgba( 255, 255, 255, .8) url('static/img/home.gif') 50% 85% no-repeat;
+         background-size: 665px 500px;
+       }
+
+       .modal-content {
+         background-color: #fefefe;
+         margin: 15% auto;
+         /* 15% from the top and centered */
+         padding: 20px;
+         border: 1px solid #888;
+         width: 30%;
+         /* Could be more or less, depending on screen size */
+       }
+       /* When the body has the loading class, we turn
+         the scrollbar off with overflow:hidden */
+
+       body.loading {
+         overflow: hidden;
+       }
+       /* Anytime the body has the loading class, our
+         modal element will be visible */
+
+       body.loading .modal {
+         display: block;
+       }
+
+
+        {% block style %}{% endblock %}
+    </style>
+
+    {% endblock %}
+</head>
+
+
+<body>
+
+
+<nav id="topNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container" style="padding-left:10px; padding-right:10px;">
+        <div class="navbar-header" id="navlogin" >
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/home" class="navbar-left"><img src="{{ url_for('static', filename='img/logo.png') }}" style="height:30px; margin-top: 15px; margin-left: 0px;"></a>
+            <a href="/home" class='navbar-brand' style = "margin-left:0px;">Toronto Housing</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>&nbsp;&nbsp;&nbsp;</li>
+                <li id="home-tab"><a href="{{ url_for('BG_data.Home') }}">Home</a></li>
+                <li id="explore-tab"><a href="{{ url_for('BG_data.Explore') }}">FSA Explorer</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a target="_blank" href="https://github.com/ian-whitestone/toronto-housing/issues/new">Report an Issue</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+	<!-- Display flashed messages -->
+	{% with msgs = get_flashed_messages(with_categories=true) %}
+		{% if msgs %}
+			<div id="flash_alerts">
+				{%- for category, msg in msgs %}
+					<div class="alert alert-{{category}} fade in" role="alert">
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						{{ msg }}
+					</div>
+				{% endfor -%}
+			</div>
+		{% endif %}
+	{% endwith %}
+
+
+	{% block page_header %}{% endblock %}
+	{% block content %}{% endblock %}
+</div>
+
+
+<footer class="footer">
+    <div class="container" valign="center">
+  		<p class="text-muted" align="center">
+  			<a href="https://github.com/ian-whitestone/toronto-housing" target="_blank"><i class="fa fa-github-alt"></i>  GitHub</a> |
+  			<a href="mailto:ianwhitestone@hotmail.com&subject=Toronto Housing Website"><small><i class="fa fa-envelope"></i></small>  Email Me</a> |
+        <a href="https://github.com/ian-whitestone/toronto-housing/issues/new" target="_blank"> <i class="fa fa-bug"></i>  Report an Issue</a>
+  		</p>
+  	</div>
+</footer>
+
+<script>
+var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+// Tooltips
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    $('#news-table').DataTable({
+        "order": [[ 5, "desc" ]]
+    });
+});
+
+// Dropdown
+$(document).ready(function () {
+    $('.dropdown-toggle').dropdown();
+});
+
+function loading(){
+            $("#loading").show();
+            $("#content").hide();
+        }
+</script>
+
+
+</body>
+
+
+</html>

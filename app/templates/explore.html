@@ -1,0 +1,351 @@
+{% extends "header.html" %}
+
+{% block title %} Explore - Regional {% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/explore.css') }}" />
+{% endblock %}
+
+
+{% block content %}
+
+
+<div id="mapid" style="height: 900px; margin-right: 15px; margin-left: 15px;"></div>
+
+<div class="form-horizontal">
+		<div class="row top-buffer"></div>
+      <label for="inputFSA" class="col-lg-4 control-label" style="horizontal-align:">Custom FSAs</label>
+			<div class="col-lg-4">
+        <input type="text" class="form-control" id="inputFSA" placeholder="List of comma separated FSAs (i.e. T9H, T2J, T2Y, ...)">
+      </div>
+			<div class="col-lg-4">
+        <button type="submit" class="btn btn-primary" onclick="multiFSATrends();">Plot Selected FSAs</button>
+      </div>
+			<div class="row top-buffer"></div>
+</div>
+
+<!-- div to hold all the fsa stats & charts -->
+<div id="fsa_statistics">
+		<div class = "chart col-md-12">
+				<div class="panel panel-default top-buffer">
+					<div class="panel-body">
+						<h1 id="section_title" style="text-align: center"></h1>
+					</div>
+				</div>
+			<div class="row top-buffer"></div>
+		</div>
+
+
+		<div class = "chart col-md-12">
+			<div class="panel panel-default top-buffer">
+				<div class="panel-body">
+					<h2 style="text-align: center">SOME TITLE</h2>
+				</div>
+			</div>
+		</div>
+
+
+		<div class = "col-md-12" id="chartContainer" style="width:95%; margin-left:2.5%; margin-right:2.5%">
+		  <div class="row">
+		    <span class="reset"></span>
+		    <a class="reset" href="javascript:dc.filterAll();dc.renderAll();" style="float:right; margin-right:10px">reset all</a>
+		  </div>
+		  <div class="row">
+		      <div id="chart1" style="width:50%">
+		          <strong>Chart 1</strong>
+		      </div>
+
+		      <div id="chart2" style="width:50%">
+		          <strong>Chart 2</strong>
+		      </div>
+		  </div>
+
+
+		</div>
+
+</div>
+
+<script>
+	$body = $("body");
+	$(document).on({
+		ajaxStart: function() { $body.addClass("loading");    },
+		ajaxStop: function() { $body.removeClass("loading"); }
+	});
+
+	function vertical_resize() {
+		var h = $(window).height() - 200;
+		$('#overlay').height(h);
+		$('#mapid').height(h);
+		$('.sidenav').height(h);
+		//alert($('#mySidenav').height());
+	}
+
+	function jsUcfirst(string)
+	{
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	window.onload = vertical_resize;
+
+	$("#fsa_statistics").hide();
+
+	var parsed_fsa_data; // global variable for parsed fsa data
+
+	// initialize map and set zoom
+	// var mymap = L.map('mapid').setView([51.2545796,-113.674376], 5); // alberta
+	var mymap = L.map('mapid').setView([43.6329761,-79.3542285], 8);
+
+	L.easyButton('fa-lock fa-lg', function(){
+		enableZoom();
+	}).addTo(mymap);
+
+	// add button to build plots for entire area
+	L.easyButton('fa-crosshairs fa-lg', function(){
+		multiFSATrends([], 'area');
+	}).addTo(mymap);
+
+
+	// only zoom with mouse wheel after clicking on map
+	mymap.scrollWheelZoom.disable();
+
+	function enableZoom() {
+  if (mymap.scrollWheelZoom.enabled()) {
+    mymap.scrollWheelZoom.disable();
+    }
+    else {
+    mymap.scrollWheelZoom.enable();
+    }
+  };
+
+	var light_theme = "https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaWFud2hpdGVzdG9uZSIsImEiOiJjajJqcXY0cGowMDIzMzJueHRkbTdwb3lxIn0.UOywpIDBUqX6my3XaHeKsw";
+	var dark_theme = "https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaWFud2hpdGVzdG9uZSIsImEiOiJjajJqcXY0cGowMDIzMzJueHRkbTdwb3lxIn0.UOywpIDBUqX6my3XaHeKsw";
+	var base_theme = "https://api.mapbox.com/styles/v1/mapbox/outdoors-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGxpbjE3IiwiYSI6ImNpcmsyMGxudzAwMnlmYm5icXlzYWsxd2IifQ.MUxIcntS8U8rRa41fbPo_Q";
+
+	// add tiles
+	var map_tl = L.tileLayer(dark_theme,
+	{
+		minZoom: 5,
+		maxZoom: 14,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		id: 'mapbox.streets'
+	});
+
+	map_tl.addTo(mymap);
+
+
+	// object to hold the json object containing the charts configuration
+	var charts;
+	// colour brewer: http://colorbrewer2.org/#type=sequential&scheme=YlGnBu&n=5
+
+
+	function getColor(d, legend) {
+		if (legend == true) {
+			return d> config[sliderSetting]['cl4'] ? config.colours.cl4 :
+					 d> config[sliderSetting]['cl3'] ? config.colours.cl3 :
+					 d> config[sliderSetting]['cl2'] ? config.colours.cl2 :
+					 d>= config[sliderSetting]['cl1'] ? config.colours.cl1 :
+								config.colours.cl0;
+		} else {
+			return d[sliderSetting] > config[sliderSetting]['cl4'] ? config.colours.cl4 :
+					 d[sliderSetting] > config[sliderSetting]['cl3'] ? config.colours.cl3 :
+					 d[sliderSetting] > config[sliderSetting]['cl2'] ? config.colours.cl2 :
+					 d[sliderSetting] >= config[sliderSetting]['cl1'] ? config.colours.cl1 :
+								config.colours.cl0;
+		}
+	}
+
+		var sliderSetting;
+		sliderSetting='stat';
+		var legend;
+		function buildLegend() {
+
+			try {
+					mymap.removeControl(legend);
+			}
+			catch (err) {
+				console.log('cannot remove legend due to err: ' + err)
+			}
+
+
+			legend = L.control({position: 'bottomleft'});
+
+			legend.onAdd = function (map) {
+
+				var div = L.DomUtil.create('div', 'info legend'),
+					levels = config[sliderSetting]['levels'],
+					labels = [];
+
+				// loop through our density intervals and generate a label with a colored square for each interval
+				div.innerHTML += '<p>' + config[sliderSetting].name + '</p>'
+
+				legend_format = config[sliderSetting].legend_format
+				for (var i = 0; i < levels.length-1; i++) {
+					if (legend_format == "$") {
+						range = dollarsWithCommas(levels[i]/1000) +
+						(dollarsWithCommas(levels[i + 1]/1000) ? '&ndash;' +
+						dollarsWithCommas(levels[i + 1]/1000) + '<br>' : '+')
+					} else if (legend_format == "%") {
+						range = levels[i] + '%' + (levels[i + 1] ? '&ndash;' + levels[i + 1] + '%<br>' : '+')
+					} else {
+						range = levels[i] + (levels[i + 1] ? '&ndash;' + levels[i + 1] + '<br>' : '+')
+					}
+					div.innerHTML += '<i style="background:' + getColor(levels[i] + 1, true) + '"></i> ' + range;
+				}
+
+				return div;
+			};
+
+			legend.addTo(mymap);
+		}
+
+	function dollarsWithCommas(x) {
+		return '$'+ x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + 'K';
+	}
+
+	// define different events for each feature
+	function onEachFeature(feature, layer) {
+	    layer.on({
+	        mouseover: highlightFeature,
+	        mouseout: resetHighlight,
+	        click: singleFSATrends
+	    });
+	}
+
+	//
+	function resetHighlight(e) {
+    fsa.resetStyle(e.target);
+		info.update();
+	}
+
+	//mouseover event
+	function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        fillColor: '#666',
+        fillOpacity: 0.7
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    };
+		info.update(layer.feature.properties);
+	}
+
+	var info = L.control();
+
+	info.onAdd = function (mymap) {
+	    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+	    this.update();
+	    return this._div;
+	};
+
+	// method that we will use to update the control based on feature properties passed
+	info.update = function (props) {
+	    this._div.innerHTML = '<h4>Canada FSA Info</h4>' +  (props ?
+	        '<b>FSA: </b>' + props.fsa + '<br />'
+					+ '<b>Stat: $</b>' + numberWithCommas(props.stat) + '<br />'
+					+ '<b>Another Stat: </b>' + numberWithCommas(props.stat)
+	        : 'Hover over a coloured area');
+	};
+
+	info.addTo(mymap);
+
+	function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	var fsa = L.geoJSON(false, {
+					onEachFeature: onEachFeature,//fsaPopup,
+					style: function(feature) {
+						// console.log(feature)
+						return {
+							fillColor: getColor(feature.properties, false),
+							weight: 2, //modify this to change outline weighting
+							fillOpacity: 0.7,
+							dashArray: '3',
+							color: 'white' //modify this to change outline colour. accepts hex cc's
+						}
+					boundary, { weight: 1 }
+					}
+				}).addTo(mymap);
+
+		$.ajax({
+		  url: "/get_config",
+		  async: true,
+		  dataType: 'json',
+		  success: function (response) {
+		    config = response.results;
+				buildLegend()
+				console.log('loading fsas')
+				loadFSAs('GTA');
+				console.log('finished loading fsas')
+		  }
+		});
+
+	function loadFSAs(province) {
+		$.ajax({
+			url: 'fsa_api',
+			data: {
+					province : province,
+					mode : 'poly'
+				},
+			type: "GET",
+			dataType: 'json',
+			complete: function(fsa_data) {
+				// parsed_fsa_data = fsa_data.responseJSON // this is blank
+				// shouldn't need to convert this to json .. debug later
+				parsed_fsa_data = jQuery.parseJSON(fsa_data.responseText)
+				fsa.clearLayers();
+				fsa.addData(parsed_fsa_data);
+
+				// createSlider()
+			}
+		});
+	};
+
+
+
+		// function to produce graphs when a single FSA is clicked
+			function singleFSATrends(e) {
+				$("#fsa_statistics").show();
+				console.log(e.target.feature.properties)
+				plot_fsa = e.target.feature.properties.fsa;
+				$("#section_title").html("Showing Trends for " + plot_fsa);
+
+				console.log('updating graphs...')
+				//remove all svgs in chart containers
+				// d3.selectAll('#chartContainer svg').remove();
+				//
+		    // // console.log(e.target.feature.properties)
+				// console.log('reloading graphs')
+				//
+				// // call the get_data api to retrieve graph data for that fsa
+				// $.ajax({
+			  //   url: "crossfilter_data",
+			  //   data: {
+			  //     mode: 'single',
+			  //     fsa: plot_fsa
+			  //   },
+			  //   complete: function(result) {
+			  //     result = jQuery.parseJSON(result.responseText)
+			  //     loadGraphs(result)
+			  //   }
+			  // });
+
+			}
+
+
+	</script>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<div class="modal">
+    <div class="modal-content">
+        <center>Loading map data (may take up to 20 seconds)...</center>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "header.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block style %}
+#topNav {
+    display: none;
+}
+
+#footer {
+  display: none;
+}
+
+body {
+    padding: 0;
+    <!-- margin-bottom: 10vh; -->
+}
+{% endblock %}
+{% block content %}
+
+
+<div class="content" align="center">
+    <div style="height:10vh;"></div>
+
+    <br>
+
+    <a href="/home" >
+    <img src="{{ url_for('static', filename='img/home.gif') }}" class="img-responsive center-block" style="max-width:50%; height: 60vh; max-height:500px;">
+    </a>
+    <h3>
+      <a href="/home" >
+        <span style="text-align:center">Enter Site</span>
+      </a>
+    </h3>
+    <br><br>
+
+</div>
+
+{% endblock %}
