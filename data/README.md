@@ -109,9 +109,3 @@ for field in config.FIELD_MAP[record_type]:
       cleaned_val = None
   fields.append(cleaned_val)
 ```
-
-## Future Work
-
-I plan to incorporate these trends in to the [Navigator II site](http://samgw.kdc.capitalone.com:52961/) once the data has been further explored and validated.
-
-Additional sites may be used if they have longer retention periods (see [Issues](https://github.kdc.capitalone.com/IanWhitestone/mongo-house/issues/1)).
