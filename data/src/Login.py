@@ -1,5 +1,5 @@
 import requests
-from private import *
+from src.private import *
 import random
 from fake_useragent import UserAgent
 

@@ -1,13 +1,13 @@
 from fake_useragent import UserAgent
-import config
+import src.config as config
 from pprint import pprint
-from Login import Login
+from src.Login import Login
 import requests
 import json
 import random
 import time
-import DataCleaning
-import database_operations as dbo
+import src.DataCleaning as DataCleaning
+import src.database_operations as dbo
 import logging as log
 
 class OhMyHome:
@@ -72,7 +72,7 @@ class OhMyHome:
             else:
                 log.error('Unable to get data, status code %s' % resp.status_code)
         except Exception as e:
-            log.error("Unable to connect to ohmyhome due to error %s" % e.message)
+            log.error("Unable to connect to ohmyhome due to error %s" % e)
             if callback == False: ## this prevents the callback from being executed more than once
                 time.sleep(10)
                 data = self._getJason(url, r_payload, callback=True)

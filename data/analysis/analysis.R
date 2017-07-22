@@ -1,4 +1,4 @@
-setwd("/Users/whitesi/Documents/Programming/Python/toronto-housing/analysis")
+setwd("/Users/whitesi/Documents/Programming/Python/toronto-housing/data/analysis")
 
 source("Postgres.R")
 library(ggplot2)
@@ -46,12 +46,16 @@ list[substr(city,1,7) == 'Toronto', region := 'Toronto']
 sold[, yymm := substr(solddate,1,7)]
 list[, yymm := substr(inputdate,1,7)]
 
-# pct over ask
+sold[, bdrm_grp := as.character(bdrm)]
+sold[bdrm>=5, bdrm_grp := '5+']
 
+# pct over ask
 sold[, poa := (soldprice-askprice)/askprice]
 
 
-
+format.money  <- function(x, ...) {
+  paste0("$", formatC(as.numeric(x), format="f", digits=0, big.mark=","))
+}
 
 
 #######################################
@@ -71,6 +75,25 @@ ggplot(sold[region=='Toronto' & type %in% main_types,
   labs(title = 'Toronto Property Sales', y='Median Sale Price', x='Date', fill='Property Type') +
   scale_y_continuous(labels = dollar,breaks=number_ticks(10))
 
+
+ggplot(sold[region=='Toronto' & type %in% homes & bdrm_grp %in% c('2','3','4'), 
+            .(med_sale_price=as.integer(median(soldprice)), count=.N) ,by=.(yymm, bdrm_grp)],
+       aes(x=yymm, y=med_sale_price, label=count, group=bdrm_grp, colour=bdrm_grp)) +
+  geom_point() + geom_line() +  theme_dlin() +
+  # geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  geom_label() +
+  labs(title = 'Toronto Home Sales', y='Median Sale Price', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = dollar,breaks=number_ticks(10))
+
+
+ggplot(sold[region=='Toronto' & type %in% c('Condo Apt'), 
+            .(med_sale_price=as.integer(median(soldprice)), count=.N) ,by=.(yymm)],
+       aes(x=yymm, y=med_sale_price, label=format.money(med_sale_price), group=1)) +
+  geom_point() + geom_line() +  theme_dlin() +
+  # geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  geom_label() +
+  labs(title = 'Toronto Condo Sales', y='Median Sale Price', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = dollar,breaks=number_ticks(10))
 
 ggplot(sold[region=='Toronto' & type %in% main_types, 
             .(med_sale_price=mean(soldprice), count=.N, dom = mean(dom)) ,by=.(yymm,type)],

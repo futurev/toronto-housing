@@ -1,5 +1,5 @@
 import os, sys
-import config
+import src.config as config
 import psycopg2
 import logging as log
 
@@ -22,8 +22,8 @@ def getConnection():
                                 password=config.PS_PWD)
         return cnxn
     except Exception as e:
-        log.error("Unable to connect to postgres due to error: " + e.message)
-        # log.exception("Unable to connect to postgres due to error: " + e.message)
+        log.error("Unable to connect to postgres due to error: " + str(e))
+        # log.exception("Unable to connect to postgres due to error: " + str(e))
         return None
 
 
@@ -41,8 +41,8 @@ def closeConnection(cnxn):
         return True
 
     except Exception as e:
-        log.error("Closing postgres connection failed due to error: " + e.message)
-        # log.exception("Closing teradata/postgres connection failed due to error: " + e.message)
+        log.error("Closing postgres connection failed due to error: " + str(e))
+        # log.exception("Closing teradata/postgres connection failed due to error: " + str(e))
         return False
 
 def query(conn, query, data=False, columns=False):
@@ -96,5 +96,5 @@ def execute_query(conn, query, data=False, multiple=False):
         cur.close()
         return True
     except Exception as e:
-        log.error("Unable to execute query due to error: " + e.message)
+        log.error("Unable to execute query due to error: " + str(e))
         return False

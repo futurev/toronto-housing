@@ -1,9 +1,9 @@
 import requests
 import json
-import config
-import database_operations as dbo
-from Login import Login
-import DataCleaning
+import src.config as config
+import src.database_operations as dbo
+from src.Login import Login
+import src.DataCleaning as DataCleaning
 import random
 import time
 import math

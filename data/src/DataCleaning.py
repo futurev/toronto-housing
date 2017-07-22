@@ -1,4 +1,4 @@
-import config
+import src.config as config
 import logging as log
 
 def check_int(**kwargs):
@@ -11,7 +11,7 @@ def check_int(**kwargs):
         except Exception as e:
             val = None
             log.error('Unable to convert %s to an integer due to error %s' %
-                    (val, e.message))
+                    (val, e))
     return val
 
 def check_varchar(**kwargs):
@@ -21,7 +21,7 @@ def check_varchar(**kwargs):
         cleaned_val = str(val)[0:kwargs['length']]
     except Exception as e:
         log.error('Unable to convert %s to a string due to error %s' %
-                (val, e.message))
+                (val, e))
         cleaned_val = None
     return cleaned_val
 
@@ -38,7 +38,7 @@ def check_char(**kwargs):
             val = str(kwargs['val'])
         except Exception as e:
             log.error('Unable to convert %s to a string due to error %s' %
-                    (val, e.message))
+                    (val, e))
             return None
     cleaned_val = val[0:kwargs['length']]
     return cleaned_val
@@ -50,7 +50,7 @@ def check_date(**kwargs):
         cleaned_val = val[0:10]
     except Exception as e:
         cleaned_val = None
-        log.error('Unable to parse date from %s due to error %s' (val, e.message))
+        log.error('Unable to parse date from %s due to error %s' (val, e))
     return cleaned_val
 
 def get_coords(**kwargs):
@@ -60,7 +60,7 @@ def get_coords(**kwargs):
         cleaned_val = [float(val[0]), float(val[1])]
     except Exception as e:
         cleaned_val = None
-        log.error('Unable to parse coords from %s due to error %s' % (val, e.message))
+        log.error('Unable to parse coords from %s due to error %s' % (val, e))
     return cleaned_val
 
 
@@ -75,5 +75,5 @@ def get_property_type(**kwargs):
         log.error('No property type found in %s' % vals)
     except Exception as e:
         log.error('Unable to get property type from %s due to error %s'
-                % (vals, e.message))
+                % (vals, e))
     return 'Other'
