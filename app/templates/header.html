@@ -85,16 +85,10 @@
     //<!-- get current URL path and assign 'active' class to TopNav bar -->
     function activeNavTab() {
         var pathname = window.location.pathname;
-        if (pathname.indexOf('/explore_all') != -1) {
-            $('#explore_all-tab').addClass('active');
-        } else if (pathname.indexOf('/home') != -1) {
+        if (pathname.indexOf('/home') != -1) {
             $('#home-tab').addClass('active');
         } else if (pathname.indexOf('/explore') != -1) {
             $('#explore-tab').addClass('active');
-        } else if (pathname.indexOf('/tableau') != -1) {
-            $('#tableau-tab').addClass('active');
-        } else if (pathname.indexOf('/compare') != -1) {
-            $('#compare-tab').addClass('active');
         }
     }
     activeNavTab();
