@@ -3,7 +3,7 @@ import logging as log
 
 def check_int(**kwargs):
     """Function to check if the field is an integer and convert if necessary"""
-    int_check = isinstance(kwargs['val'], ( int, long ) )
+    int_check = isinstance(kwargs['val'], int)
     val = kwargs['val']
     if int_check == False:
         try:
@@ -31,7 +31,7 @@ def check_char(**kwargs):
     """
 
     val = kwargs['val']
-    str_check = isinstance(kwargs['val'], ( str, basestring ) )
+    str_check = isinstance(kwargs['val'], str)
     val = kwargs['val']
     if str_check == False:
         try:

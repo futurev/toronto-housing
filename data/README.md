@@ -105,7 +105,7 @@ def _buildPayloads(self):
               })
 
   return payloads
-  
+
 def _getCoords(self):
   south = config.SOUTH
   west = config.WEST
@@ -122,6 +122,10 @@ def _getCoords(self):
   return lat_coords, long_coords
 ```
 The API is then called for each sub-area, as demonstrated below:
+
+<p align="center">
+<img src="./img/grid.gif" width="1500px" >
+</p>
 
 ## Data ETL Process
 To clean and transform the data from the JSON response to the format required by the Postgres database, I created a `FIELD_MAP` parameter in `config.py` which defines the field name in the JSON response and which functiion should be used to validate/transform the field.

@@ -140,12 +140,12 @@ class OhMyHome:
         """Internal function to clean and store the returned json data"""
         if record_type == 'list':
             base_url = config.LISTING_URL
-            num_cols = 13
+            num_cols = 13 ##TODO: move to config?
             table = 'list_records'
             stored_records = self.stored_listings
         else:
             base_url = config.SOLD_RECORD_URL
-            num_cols = 15
+            num_cols = 15 ##TODO: move to config?
             table = 'sale_records'
             stored_records = self.stored_sales
 
