@@ -6,6 +6,7 @@ Monitoring different areas of the Toronto housing market could be useful for und
 
 ## Getting the data
 
+### MongoHouse
 MongoHouse allows user to choose to view new listings or sold records, and displays the data in a map view.
 
 <p align="center">
@@ -26,7 +27,7 @@ And the response is a beautifully formatted JSON object:
 
 Lucky for us, MongoHouse uses client-side API calls to retrieve the data shown across the site. Using the Python requests module we can easily make the same API calls programatically.
 
-## Authentification
+#### Authentification
 
 Most of the MongoHouse APIs require no authentification in order to retrieve the data. However, in order to view the sale prices an account is required.
 
@@ -70,6 +71,57 @@ Once the login is accomplished, simple requests can be made to retrieve the data
 r = session.get(url)
 data = json.loads(r.text) ## or r.json() can be used
 ```
+
+### OhMyHome
+OhMyHome requires no login/authentification, making the data retrieval much easier. Their API can be accessed by sending a post request to `http://watch.ohmyhome.ca/HouseForSale/HouseForSale.php` with a request payload like `{"latitude1":43.044628815323996,"longitude1":-80.78431278320312,"latitude2":43.84227688250318,"longitude2":-77.94709354492187}`.
+
+Originally, I very naively thought I could get all the data by pinging the API with lat/lon coordinates that encompassed all of Ontario. This resulted in a server error being thrown and no data returned.
+
+To fix this, I specify a big area I want to retrieve results for, and the number of divisions to create within that area.
+
+```python
+## coordinates
+SOUTH = 42.7347443837978
+WEST = -82.05335556083372
+NORTH = 45.317234079179435
+EAST = -77.49128280692747
+
+DIVISIONS = 15
+```
+
+Note that 15 "divisions" means 15 slices vertically and 15 slices horizontally. The `_buildPayloads` function is called to split the specified area into 225 sub-areas (i.e. `15*15`), and return the coordinates for each of those areas. I arrived at 15 divisions through trial and error, where I increased the number of divisions until I wasn't getting server errors.
+
+```python
+def _buildPayloads(self):
+  lat_coords, long_coords = self._getCoords()
+  payloads = []
+  for x in range(1, config.DIVISIONS+1):
+      for y in range(1, config.DIVISIONS+1):
+          payloads.append({
+              "latitude1": lat_coords[y-1],
+              "longitude1": long_coords[x-1],
+              "latitude2": lat_coords[y],
+              "longitude2": long_coords[x]
+              })
+
+  return payloads
+  
+def _getCoords(self):
+  south = config.SOUTH
+  west = config.WEST
+  lat_div = (config.NORTH - config.SOUTH)/config.DIVISIONS
+  long_div = (abs(config.WEST) - abs(config.EAST))/config.DIVISIONS
+  lat_coords = [south]
+  long_coords = [west]
+
+  for x in range(0, config.DIVISIONS):
+      south += lat_div
+      west += long_div
+      lat_coords.append(south)
+      long_coords.append(west)
+  return lat_coords, long_coords
+```
+The API is then called for each sub-area, as demonstrated below:
 
 ## Data ETL Process
 To clean and transform the data from the JSON response to the format required by the Postgres database, I created a `FIELD_MAP` parameter in `config.py` which defines the field name in the JSON response and which functiion should be used to validate/transform the field.
