@@ -57,7 +57,7 @@ def _getCoords(self):
 The API is then called for each sub-area, as demonstrated below:
 
 <p align="center">
-<img src=".data//img/grid.gif" width="1500px" >
+<img src="./data/img/grid.gif" width="1500px" >
 </p>
 
 ## Data ETL Process
