@@ -25,24 +25,6 @@ def check_varchar(**kwargs):
         cleaned_val = None
     return cleaned_val
 
-def check_char(**kwargs):
-    """Function to check if the field is the correct length and trunctuate if necessary
-        Also checks if it is a string and converts if necessary.
-    """
-
-    val = kwargs['val']
-    str_check = isinstance(kwargs['val'], str)
-    val = kwargs['val']
-    if str_check == False:
-        try:
-            val = str(kwargs['val'])
-        except Exception as e:
-            log.error('Unable to convert %s to a string due to error %s' %
-                    (val, e))
-            return None
-    cleaned_val = val[0:kwargs['length']]
-    return cleaned_val
-
 def check_date(**kwargs):
     """Function to extract the date from the zulu time string"""
     try:
