@@ -1,7 +1,7 @@
 # toronto housing
 [MongoHouse](http://www.mongohouse.com/) & [OhMyHome](http://watch.ohmyhome.ca) are real estate websites targeted at providing information on the Toronto/GTA housing market. One of the unique features of the site is that it includes sale prices, which is generally information that is only available to realtors.
 
-Monitoring different areas of the Toronto housing market could be useful for understanding which areas have seen the highest price increases and could be prone to a correction. Alternatively, if & when a general housing market correction occurs, it would be useful to see which areas are hit the hardest.
+Monitoring different areas of the Toronto housing market could be useful for understanding which areas have seen the highest price increases and could be prone to a correction. Alternatively, if and when a general housing market correction occurs, it would be useful to see which areas are hit the hardest.
 
 
 ## Getting the data

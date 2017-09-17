@@ -69,11 +69,33 @@ condos = c('Condo Apt', 'Condo Townhouse')
 
 ggplot(sold[region=='Toronto' & type %in% main_types, 
             .(med_sale_price=as.integer(median(soldprice)), count=.N) ,by=.(yymm,type)],
-       aes(x=yymm, y=med_sale_price, label=count, fill=type)) +
-  geom_bar(stat='identity', position="dodge") +  theme_dlin() +
+       aes(x=yymm, y=med_sale_price, label=count, group=type, colour=type)) +
+  geom_point() + geom_line() +  theme_dlin() +
   geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
   labs(title = 'Toronto Property Sales', y='Median Sale Price', x='Date', fill='Property Type') +
   scale_y_continuous(labels = dollar,breaks=number_ticks(10))
+
+
+
+merge = rbind(
+  sold[region=='Toronto' & type == 'Detached', 
+       .(med_price=as.integer(median(soldprice)), type='Sale', count=.N),
+       by=.(yymm)],
+  list[region=='Toronto' & type == 'Detached', 
+       .(med_price=as.integer(median(askprice)), type='Listing', count=.N),
+       by=.(yymm)]
+)
+
+## LISTING DATA IS SHIT BASED ON WHEN YOU STARTED SCRAPING!!
+ggplot(merge[as.integer(substring(yymm,1,4))>2015,],
+       aes(x=yymm, y=med_price, label=count, group=type, colour=type)) +
+  geom_point() + geom_line() +  theme_dlin() +
+  geom_text(position=position_dodge(width= 0.9), vjust=-0.25) +
+  labs(title = 'Toronto Property Sales', y='Median Price', x='Date', fill='Property Type') +
+  scale_y_continuous(labels = dollar,breaks=number_ticks(10))
+
+
+
 
 
 ggplot(sold[region=='Toronto' & type %in% homes & bdrm_grp %in% c('2','3','4'), 
